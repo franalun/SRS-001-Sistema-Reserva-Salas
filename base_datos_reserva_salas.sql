@@ -1,50 +1,59 @@
-drop database if exists sistema_salas;
+DROP DATABASE IF EXISTS sistema_salas;
 
-create database sistema_salas
+CREATE DATABASE sistema_salas
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_general_ci;
 
-character set utf8mb4
-collate utf8mb4_general_ci;
+USE sistema_salas;
 
-use sistema_salas;
-
-create table Usuario(
-    id_usuario int primary key auto_increment,
-    username varchar(50) not null unique,
-    nombre varchar(50) not null,
-    apellido varchar(50) not null,
-    telefono varchar(20),
-    email varchar(100) unique,
-    password_hash varchar(255) not null,
+CREATE TABLE Usuario(
+    id_usuario INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    telefono VARCHAR(20),
+    email VARCHAR(100) UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
     tipo_usuario VARCHAR(20) NOT NULL DEFAULT 'empleado'
 );
 
-create table Sala(
-    id_sala int primary key auto_increment,
-    nombre varchar(100) not null,
-    ubicacion varchar(100) not null,
-    capacidad int not null,
-    estado ENUM('Disponible', 'En mantenimiento') not null,
+CREATE TABLE Sala(
+    id_sala INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    ubicacion VARCHAR(100) NOT NULL,
+    capacidad INT NOT NULL,
+    estado ENUM('Disponible', 'En mantenimiento') NOT NULL,
 
-    constraint chk_sala_capacidad
-    check(capacidad>0)
+    CONSTRAINT chk_sala_capacidad
+    CHECK(capacidad > 0)
 );
 
-create table Reserva(
-    id_reserva int primary key auto_increment,
-    id_usuario int not null,
-    id_sala int not null,
-    fecha DATE not null,
-    hora TIME not null,
-
-    constraint fk_reserva_usuario
-    foreign key (id_usuario)
-    references Usuario(id_usuario)
-    on update cascade
-    on delete restrict,
-
-    constraint fk_reserva_sala
-    foreign key (id_sala)
-    references Sala(id_sala)
-    on update cascade
-    on delete restrict
+CREATE TABLE Horario(
+    id_horario INT PRIMARY KEY AUTO_INCREMENT,
+    hora_inicio TIME NOT NULL,
+    hora_fin TIME NOT NULL
 );
+
+CREATE TABLE Reserva(
+    id_reserva INT PRIMARY KEY AUTO_INCREMENT,
+    id_usuario INT NOT NULL,
+    id_sala INT NOT NULL,
+    id_horario INT NOT NULL,
+    fecha DATE NOT NULL,
+
+    CONSTRAINT fk_reserva_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES Usuario(id_usuario),
+
+    CONSTRAINT fk_reserva_sala
+        FOREIGN KEY (id_sala)
+        REFERENCES Sala(id_sala),
+
+    CONSTRAINT fk_reserva_horario
+        FOREIGN KEY (id_horario)
+        REFERENCES Horario(id_horario)
+);
+
+ALTER TABLE Reserva
+ADD CONSTRAINT uq_reserva
+UNIQUE(id_sala, id_horario, fecha);
