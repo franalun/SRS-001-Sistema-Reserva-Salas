@@ -118,13 +118,13 @@ class Empleado(Usuario):
 
 
 class Sala(ActiveRecord):
-    def __init__(self, id_sala: int, nombre: str, ubicacion: str, capacidad: int, estado: str):
+    def __init__(self, id_sala: int, nombre: str, ubicacion: str, capacidad: int, estado: str = None):
         self.__id_sala = id_sala
         self.__nombre = nombre
         self.__ubicacion = ubicacion
         self.__capacidad = capacidad
         self.__estado = estado
-
+    
     def obtener_id(self):
         return self.__id_sala
 
@@ -141,10 +141,33 @@ class Sala(ActiveRecord):
         return self.__estado
 
     def guardar(self):
-        pass
+        cnn = Conexion().obtener_conexion()
+        cursor = cnn.cursor()
+        cursor.execute(
+            "INSERT INTO Sala (nombre, ubicacion, capacidad, estado) VALUES (%s, %s, %s, %s)",
+            (self.__nombre, self.__ubicacion, self.__capacidad, self.__estado)
+        )
+        cnn.commit()
+        cursor.close()
 
     def actualizar(self) -> None:
-        pass
+        try:
+            cnn = Conexion().obtener_conexion()
+            cursor = cnn.cursor()
+
+            cursor.execute("SELECT * FROM Sala (id_sala) WHERE id_sala = %s",
+                        (self.__id_sala,))
+
+            if not cursor.fetchone():
+                raise ValueError('La sala debe existir en la base de datos antes de actualizarla.')
+
+            cursor.execute(
+                "UPDATE Sala SET nombre = %s, ubicacion = %s, capacidad = %s, estado = %s WHERE id_sala = %s",
+                (self.__nombre, self.__ubicacion, self.__capacidad, self.__estado, self.__id_sala)
+            )
+        finally:
+            cnn.commit()
+            cursor.close()
 
     def eliminar(self) -> None:
         pass
