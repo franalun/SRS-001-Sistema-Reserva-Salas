@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import messagebox
 import tkinter.ttk as ttk
 from consulta_salas import *
-from conexion import Conexion
 
 VENTANA_DIMENSIONES = '640x480'
 usuario_tipo_actual = None
@@ -18,6 +17,44 @@ def mostrar_ventana(tipo: str = 'info', mensaje: str = None, padre: tk.Tk = None
             messagebox.showerror('Error', mensaje, parent=padre)
         case 'advertencia':
             messagebox.showwarning('Advertencia', mensaje, parent=padre)
+
+def ventana_salas():
+    ventana = tk.Tk()
+    ventana.title('Listado de salas')
+    ventana.geometry(VENTANA_DIMENSIONES)
+
+    titulo = tk.Label(ventana, text = 'Listado de salas', font = ('Arial', 16, 'bold'))
+    titulo.pack(pady=10)
+
+    columnas = ('id', 'nombre', 'ubicacion','capacidad','estado')
+    tabla = ttk.Treeview(ventana, columns=columnas, show='headings')
+
+    tabla.heading('id', text='ID')
+    tabla.heading('nombre', text='Nombre')
+    tabla.heading('ubicacion', text='Ubicación')
+    tabla.heading('capacidad', text='Capacidad')
+    tabla.heading('estado', text='Estado')
+
+    tabla.column('id', width=40)
+    tabla.column('nombre', width=140)
+    tabla.column('ubicacion', width=120)
+    tabla.column('capacidad', width=80)
+    tabla.column('estado', width=120)
+
+    tabla.pack(fill='both', expand=True, padx=15, pady=10)
+
+    salas = Sala.buscar_todos()
+    
+    if len(salas) == 0:
+        mostrar_ventana('info', 'No hay salas registradas', ventana)
+
+    for sala in salas:
+        tabla.insert('', 'end', values=(sala.obtener_id(), sala.obtener_nombre(),
+        sala.obtener_ubicacion(), sala.obtener_capacidad(), sala.obtener_estado()))
+    
+    ventana.mainloop()
+
+
 
 def ventana_login():
     login = tk.Tk()
@@ -54,7 +91,7 @@ def ventana_login():
                 usuario_tipo_actual = "empleado"
 
             login.destroy()
-            main()  # Asegúrate de tener definida esta función
+            ventana_salas()
         except Exception as e:
             mostrar_ventana("error", f"Error al iniciar sesión:\n{e}", login)
 
@@ -63,3 +100,4 @@ def ventana_login():
 
 if __name__ == '__main__':
     ventana_login()
+

@@ -165,7 +165,7 @@ class Sala(ActiveRecord):
     def buscar_todos(cls):
         cnn = Conexion().obtener_conexion()
         cursor = cnn.cursor()
-        sql = "SELECT id_sala, nombre, ubicacion, capacidad, estado FROM Sala"
+        sql = "SELECT id_sala, nombre, ubicacion, capacidad, estado FROM Sala ORDER BY nombre"
         cursor.execute(sql)
         filas = cursor.fetchall()
         cursor.close()

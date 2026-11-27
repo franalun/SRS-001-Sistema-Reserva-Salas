@@ -7,8 +7,8 @@ values ('Admin01', 'matias', 'riquelme', '+56912345678', 'admin@mail.com', SHA2(
 
 -- inserto salas
 
-insert into Sala(nombre, ubicacion, capacidad)
-values ('Sala de estudios 1', '4to piso', 15);
+insert into Sala(nombre, ubicacion, capacidad, estado)
+values ('Sala de estudios 1', '4to piso', 15, 'Disponible');
 
 -- inserto reservas
 
